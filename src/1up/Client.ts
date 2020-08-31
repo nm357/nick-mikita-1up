@@ -45,18 +45,16 @@ export default class Client {
 
   async createUser(appUserId: string | number) {
     try {
-      const params = this.appendCredentials(new URLSearchParams());
-      params.append('app_user_id', `${appUserId}`);
-
-      // const reqBody = `client_id=${this.creds.id}&client_secret=${this.creds.secret}&app_user_id=${appUserId}`;
+      const reqBody = `client_id=${this.creds.id}&client_secret=${this.creds.secret}&app_user_id=${appUserId}`;
       
       const response = await fetch(`${URL.Api}${URL.User_Mgmt}`, { 
         method: 'post',
-        body: params,
+        body: reqBody,
+        mode: 'no-cors',
         headers: {'Access-Control-Allow-Origin': '*'}
-      })
-        .then((res: any) => res.json())
-        .catch((err: any) => console.log('Error creating user: ', err));
+      });
+
+      console.log('user response: ', response);
   
       if (response && response.success) {
         return new User(response.app_user_id, response.code);
@@ -77,9 +75,7 @@ export default class Client {
     if (accessCode) params.append('code', accessCode);
     if (refreshToken) params.append('refresh_token', refreshToken);
 
-    const response = await fetch(`${URL.Api}${URL.Token_Mgmt}`, { method: 'post', body: params })
-      .then((res: any) => res.json())
-      .catch((err: any) => console.log('Error getting tokens: ', err));
+    const response = await fetch(`${URL.Api}${URL.Token_Mgmt}`, { method: 'post', body: params, mode: 'no-cors' })
       
     if (response && !response.error) {
       return {
