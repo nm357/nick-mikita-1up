@@ -1,12 +1,12 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
-import Ui from './1up/ui';
+import OneUpApp from './1up/OneUpApp';
 import * as serviceWorker from './serviceWorker';
 
 ReactDOM.render(
   <React.StrictMode>
-    <Ui />
+    <OneUpApp />
   </React.StrictMode>,
   document.getElementById('root')
 );
