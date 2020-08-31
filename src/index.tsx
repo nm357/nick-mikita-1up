@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
-import OneUpApp from './1up/OneUpApp';
+import OneUpApp from './1up/OneUpApp.jsx';
 import * as serviceWorker from './serviceWorker';
 
 ReactDOM.render(
