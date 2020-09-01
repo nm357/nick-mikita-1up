@@ -7,7 +7,7 @@ Configure for local running:
 
 * run "npm install"
 
-* Create a .env file in the project root, including "CLIENT_ID=..." and "CLIENT_SECRET=..." with the appropriate values.
+* Create a .env file in the project root, including "CLIENT_ID=..." and "CLIENT_SECRET=..." with the appropriate values. The registered App name is "Nick_Mikita_App" on my 1up Dashboard.
 
 * To run both the React app and express server, use "npm run dev"
 
