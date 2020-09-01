@@ -35,7 +35,7 @@ app.get('/', async (req, res) => {
   } else {
     console.log('auth redirect indicated success');
   }
-  res.redirect(`${client_app_url}/${req.url}`);
+  res.redirect(`${client_app_url}${req.url}`);
 });
 
 app.post('/api/code', async (req, res) => {
