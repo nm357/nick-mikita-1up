@@ -8,18 +8,33 @@ export default class OneUpApp extends React.Component {
     super(props);
 
     this.state = {
-      apiResponse: undefined
+      apiResponse: undefined,
+      accessCode: undefined
     }
 
-    this.handleClick = this.handleClick.bind(this);
+    this.handleGetCode = this.handleGetCode.bind(this);
+    this.handleGetToken = this.handleGetToken.bind(this);
+    this.handleGetEverything = this.handleGetEverything.bind(this);
+    this.getCode = this.getCode.bind(this);
+    this.getToken = this.getToken.bind(this);
+    this.getEverything = this.getEverything.bind(this);
   }
 
-  handleClick(event) {
+ 
+
+  handleGetCode(event) {
     event.preventDefault();
-    // this.getToken('4f53f2cb34724277a61f2bcc11d70d36');
-    // this.getFhirAuth('996cd2f6bca74878a7f2bfe658f17597');
-    this.getFhirEverything('306341f4490a4b94ac6b1bc8ea8c14f8');
-    // this.getCode('1');
+    this.getCode('1');
+  }
+
+  handleGetToken(event) {
+    event.preventDefault();
+    this.getToken(this.state.accessCode);
+  }
+
+  handleGetEverything(event) {
+    event.preventDefault();
+    this.getEverything(this.state.accessCode);
   }
 
   async getCode(appUserId) {
@@ -32,21 +47,40 @@ export default class OneUpApp extends React.Component {
     const json = await response.json();
 
     console.log('response from express', json);
-    this.setState({apiResponse: JSON.stringify(json)});
+    this.setState({
+      apiResponse: JSON.stringify(json),
+      accessCode: json.code,
+      appUserId: json.app_user_id
+    });
   }
 
-  async getToken(accessCode) {
+  async getToken() {
     const response = await fetch(`/api/token`, {
       method: 'POST',
       headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-      body: `code=${accessCode}`
+      body: `code=${this.state.accessCode}`
     });
 
     const json = await response.json();
 
-    console.log('response from express',);
     console.log('response from express', json);
-    this.setState({apiResponse: JSON.stringify(json)});
+    this.setState({
+      apiResponse: JSON.stringify(json),
+      accessToken: json.access_token
+    });
+  }
+
+  async getEverything(accessCode) {
+    const patientId = '1d5e078b47ba'; // TODO get from state
+    const response = await fetch('/api/fhir/everything', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+      body: `code=${accessCode}&patient_id=${patientId}`
+    });
+
+    const json = await response.json();
+
+    console.log('json from express', json);
   }
 
   async getFhirAuth(accessCode) {
@@ -79,13 +113,24 @@ export default class OneUpApp extends React.Component {
     this.setState({apiResponse: JSON.stringify(json)});
   }
 
+  componentDidMount() {
+    console.log('init state', this.state);
+  }
+
+  componentDidUpdate() {
+    console.log('updated state', this.state);
+  }
+
   render() {
+    console.log('state', this.state);
     return(
       <div id="ui-container">
         1up UI
 
-        <button onClick={this.handleClick}>Get Code</button>
-        <div>
+        <button onClick={this.handleGetCode}>Get Code</button>
+        <button onClick={this.handleGetToken}>Then Get Token</button>
+        <button onClick={this.handleGetEverything}>Then Get Everything</button>
+        {/* <div>
           QuickConnect
           <button onClick={this.handleClick}>Connect</button>
         </div>
@@ -93,6 +138,10 @@ export default class OneUpApp extends React.Component {
         <div>
           $everything
           <button onClick={this.handleClick}>Connect</button>
+        </div> */}
+
+        <div>
+          <a target="_blank" rel="noopener noreferrer" href={`https://quick.1up.health/connect/4706?access_token=${this.state.accessToken}`}>Connect with Token</a>
         </div>
 
         <div>

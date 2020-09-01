@@ -5,12 +5,16 @@ const fetch = require('isomorphic-fetch');
 
 const { getAllFhirResourceBundles } = require('../src/1up/oneup');
 
+const cors = require('cors');
 const app = express();
+
+app.use(cors());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(pino);
 
 const PORT = 8000;
+const client_app_url = 'http://localhost:3000';
 const client_id = process.env.CLIENT_ID || 'id';
 const client_secret = process.env.CLIENT_SECRET || 'id';
 
@@ -25,9 +29,20 @@ let auth = {
 };
 
 app.get('/', async (req, res) => {
-  console.log('got 8000/');
+  console.log(req.query);
+  console.log(req.url);
+  if (req.query.success === 'false') {
+    console.log('auth redirect indicated failure');
+  } else {
+    console.log('auth redirect indicated success');
+  }
+  res.redirect(`${client_app_url}/${req.url}`);
+});
+
+app.post('/', async (req, res) => {
+  console.log('got post 8000/');
   console.log(req);
-})
+});
 
 app.post('/api/code', async (req, res) => {
   const appUserId = req.body.app_user_id;
@@ -93,26 +108,38 @@ app.post('/api/fhir/everything', async (req, res) => {
   console.log('$everything');
   const access_token = req.body.code || 'accessCode';
   const patient_id = req.body.patient_id || 'patientId';
-  const fhirVersion = 'DSTU2';
-  const url = `https://api.1up.health/fhir/${fhirVersion}/Patient/${patient_id}/$everything`
+  const fhirVersion = req.body.fhirVersion || 'DSTU2';
+
+  const url = `${api_url}/${fhirVersion}/Patient/${patient_id}/$everything`
 
   try {
-    // const apiResponse = await fetch(url, { method: 'GET', headers: {'Authorization': `Bearer ${access_token}`} })
-    //   .then(res => { console.log(res); })
-    //   .then(res => res.json)
-    //   .then(json => json)
-    //   .catch(err => console.log('err', err));
+    const reqOptions = {
+      method: 'GET', 
+      headers: {
+        'Authorization': `Bearer ${access_token}`,
+        'credentials': 'include'
+      }
+    };
+
+    
+    const apiResponse = await fetch(url, reqOptions)
+      .then(res => { console.log('res status', res.status); return res; })
+      .then(res => { console.log('res', res); return res; })
+      .then(res => res.json)
+      .then(json => json)
+      .catch(err => err);
   
-      const bundles = await new Promise((res, rej) => {
-        getAllFhirResourceBundles(access_token, (data) => res(data));
-      }).then(data => data); 
+      // const bundles = await new Promise((res, rej) => {
+      //   getAllFhirResourceBundles(access_token, (data) => res(data));
+      // }).then(data => data); 
   
-      console.log('bundles', bundles);
+      // console.log('bundles', bundles);
   
-      // res.send(apiResonse);
-      res.send(bundles);
+    console.log('apiResponse', apiResponse);
+    res.send(apiResonse);
+      // res.send(bundles);
   } catch (error) {
-    res.send({error});
+    res.send({error: JSON.stringify(error)});
   }
 });
 
