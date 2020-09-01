@@ -3,8 +3,6 @@ const bodyParser = require('body-parser');
 const pino = require('express-pino-logger')();
 const fetch = require('isomorphic-fetch');
 
-const { getAllFhirResourceBundles } = require('../src/1up/oneup');
-
 const cors = require('cors');
 const app = express();
 
@@ -83,7 +81,7 @@ app.post('/api/token', async (req, res) => {
  *  -H "Authorization: Bearer accesstokenaccesstoken"
  */
 app.post('/api/fhir/everything', async (req, res) => {
-  const access_token = req.body.code || 'accessCode';
+  const access_token = req.body.access_token || 'accessCode';
   const patient_id = req.body.patient_id || 'patientId';
   const fhirVersion = req.body.fhirVersion || 'DSTU2';
 

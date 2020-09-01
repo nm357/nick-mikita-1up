@@ -1,7 +1,6 @@
 import React from 'react';
-import Client from './Client';
 
-const fetch = require('node-fetch');
+const fetch = require('isomorphic-fetch');
 
 export default class OneUpApp extends React.Component {
   constructor(props) {
@@ -9,7 +8,8 @@ export default class OneUpApp extends React.Component {
 
     this.state = {
       apiResponse: undefined,
-      accessCode: undefined
+      accessCode: undefined,
+      appUserId: 'nick'
     }
 
     this.handleGetCode = this.handleGetCode.bind(this);
@@ -17,14 +17,15 @@ export default class OneUpApp extends React.Component {
     this.handleGetEverything = this.handleGetEverything.bind(this);
     this.getCode = this.getCode.bind(this);
     this.getToken = this.getToken.bind(this);
-    this.getEverything = this.getEverything.bind(this);
+    this.getFhirEverything = this.getFhirEverything.bind(this);
   }
 
  
 
   handleGetCode(event) {
     event.preventDefault();
-    this.getCode('1');
+    const appUserId = this.state.appUserId || 'appUserId';
+    this.getCode(appUserId);
   }
 
   handleGetToken(event) {
@@ -34,7 +35,7 @@ export default class OneUpApp extends React.Component {
 
   handleGetEverything(event) {
     event.preventDefault();
-    this.getEverything(this.state.accessToken);
+    this.getFhirEverything(this.state.accessToken);
   }
 
   async getCode(appUserId) {
@@ -70,22 +71,8 @@ export default class OneUpApp extends React.Component {
     });
   }
 
-  async getEverything(accessCode) {
-    const patientId = '1d5e078b47ba'; // TODO get from state
-    const response = await fetch('/api/fhir/everything', {
-      method: 'POST',
-      headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-      body: `code=${accessCode}&patient_id=${patientId}`
-    });
-
-    const json = await response.json();
-
-    console.log('json from express', json);
-  }
-
-
   async getFhirEverything(accessToken) {
-    const patientId = '1d5e078b47ba';
+    const patientId = '2515025074d8'; // TODO get from QuickConnect Api?
     const response = await fetch(`/api/fhir/everything`, {
       method: 'POST',
       headers: {'Content-Type': 'application/x-www-form-urlencoded'},

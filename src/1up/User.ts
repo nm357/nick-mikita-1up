@@ -2,10 +2,10 @@ export default class User {
   private accessCode: string | undefined;
   private accessToken: string | undefined;
   private refreshToken: string | undefined;
-  readonly appUserId: string | number | undefined;
+  readonly appUserId: string;
 
   constructor(
-    appUserId: string | number, 
+    appUserId: string, 
     accessCode?: string, 
     accessToken?: string, 
     refreshToken?: string
