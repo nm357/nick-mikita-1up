@@ -20,7 +20,8 @@ const token_url = 'https://api.1up.health/fhir/oauth2/token';
 const api_url = 'https://api.1up.health/fhir';  
 const scope = 'user/*.*';
 
-let auth = {
+// TODO handle refreshing tokens
+const auth = {
   code: undefined,
   access_token: undefined,
   refresh_token: undefined
@@ -35,11 +36,6 @@ app.get('/', async (req, res) => {
     console.log('auth redirect indicated success');
   }
   res.redirect(`${client_app_url}/${req.url}`);
-});
-
-app.post('/', async (req, res) => {
-  console.log('got post 8000/');
-  console.log(req);
 });
 
 app.post('/api/code', async (req, res) => {
