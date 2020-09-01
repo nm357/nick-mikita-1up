@@ -10,17 +10,13 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(pino);
 
-const PORT = 3001;
+const PORT = 8000;
 const client_id = process.env.CLIENT_ID || 'id';
 const client_secret = process.env.CLIENT_SECRET || 'id';
 
 const token_url = 'https://api.1up.health/fhir/oauth2/token'; 
 const api_url = 'https://api.1up.health/fhir';  
-const scope = 'user/*.*';  
-
-// Create AppUser
-// Get AppUser Access Code
-// Exchange code for tokens
+const scope = 'user/*.*';
 
 let auth = {
   code: undefined,
@@ -28,13 +24,17 @@ let auth = {
   refresh_token: undefined
 };
 
+app.get('/', async (req, res) => {
+  console.log('got 8000/');
+  console.log(req);
+})
+
 app.post('/api/code', async (req, res) => {
-  const appUserId = req.body.appUserId;
+  const appUserId = req.body.app_user_id;
   const url = `https://api.1up.health/user-management/v1/user/auth-code?app_user_id=${appUserId}&client_id=${client_id}&client_secret=${client_secret}`;
   const apiResonse = await fetch(url, { method: 'POST' })
     .then(res => res.json())
     .then(json => { 
-      console.log('json response from 1up', json);
       auth.code = json.code;
       return json 
     })
@@ -44,18 +44,12 @@ app.post('/api/code', async (req, res) => {
 });
 
 app.post('/api/token', async (req, res) => {
-  console.log('body: ', req.body);
   const code = req.body.code || 'accessCode';
-  console.log('code in server: ', code);
-
-  res.setHeader('Content-Type', 'application/json');
   const postUrl = `${token_url}?client_id=${client_id}&client_secret=${client_secret}&code=${code}&grant_type=authorization_code`;
-  console.log('url: ', postUrl);
   
   const apiResonse = await fetch(postUrl, { method: 'POST' })
     .then(res => res.json())
     .then(json => { 
-      console.log('json response from 1up', json);
       auth.access_token = json.access_token;
       auth.refresh_token = json.refresh_token;
       return json 
@@ -79,6 +73,7 @@ app.post('/api/fhir', async (req, res) => {
   // const url = `${api_url}/${system_id}?access_token=${access_token}`;
   const url = 'https://quick.1up.health/connect/4706?access_token=996cd2f6bca74878a7f2bfe658f17597'
 
+  // redirect gives url params
   const apiResonse = await fetch(url, { method: 'GET' })
     .then(res => {
       console.log('res', res);
