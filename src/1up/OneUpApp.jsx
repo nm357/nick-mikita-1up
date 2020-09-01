@@ -34,7 +34,7 @@ export default class OneUpApp extends React.Component {
 
   handleGetEverything(event) {
     event.preventDefault();
-    this.getEverything(this.state.accessCode);
+    this.getEverything(this.state.accessToken);
   }
 
   async getCode(appUserId) {
@@ -83,46 +83,22 @@ export default class OneUpApp extends React.Component {
     console.log('json from express', json);
   }
 
-  async getFhirAuth(accessCode) {
-    const response = await fetch(`/api/fhir`, {
-      method: 'POST',
-      headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-      // body: `code=${accessCode}`
-      body: `code=996cd2f6bca74878a7f2bfe658f17597`
-    });
 
-    const json = await response.json();
-
-    console.log('response from express',);
-    console.log('response from express', json);
-    // this.setState({apiResponse: JSON.stringify(json)});
-  }
-
-  async getFhirEverything(accessCode) {
+  async getFhirEverything(accessToken) {
     const patientId = '1d5e078b47ba';
     const response = await fetch(`/api/fhir/everything`, {
       method: 'POST',
       headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-      body: `code=${accessCode}&patient_id=${patientId}`
+      body: `access_token=${accessToken}&patient_id=${patientId}`
     });
 
-    console.log(response);
     const json = await response.json();
 
     console.log('response from express', json);
     this.setState({apiResponse: JSON.stringify(json)});
   }
 
-  componentDidMount() {
-    console.log('init state', this.state);
-  }
-
-  componentDidUpdate() {
-    console.log('updated state', this.state);
-  }
-
   render() {
-    console.log('state', this.state);
     return(
       <div id="ui-container">
         1up UI
@@ -130,15 +106,6 @@ export default class OneUpApp extends React.Component {
         <button onClick={this.handleGetCode}>Get Code</button>
         <button onClick={this.handleGetToken}>Then Get Token</button>
         <button onClick={this.handleGetEverything}>Then Get Everything</button>
-        {/* <div>
-          QuickConnect
-          <button onClick={this.handleClick}>Connect</button>
-        </div>
-
-        <div>
-          $everything
-          <button onClick={this.handleClick}>Connect</button>
-        </div> */}
 
         <div>
           <a target="_blank" rel="noopener noreferrer" href={`https://quick.1up.health/connect/4706?access_token=${this.state.accessToken}`}>Connect with Token</a>

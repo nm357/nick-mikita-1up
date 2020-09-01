@@ -59,6 +59,7 @@ app.post('/api/code', async (req, res) => {
 });
 
 app.post('/api/token', async (req, res) => {
+  console.log('auth', auth);
   const code = req.body.code || 'accessCode';
   const postUrl = `${token_url}?client_id=${client_id}&client_secret=${client_secret}&code=${code}&grant_type=authorization_code`;
   
@@ -74,38 +75,14 @@ app.post('/api/token', async (req, res) => {
   res.send(apiResonse);
 });
 
-// FHIR Api $everything query
-// To query everything simply hit this endpoint with the patient's id, fhir version type (dstu2/stu3/r4) and their bearer access token.
-
-// curl -X GET 'https://api.1up.health/fhir/{fhirVersion}/Patient/{patient_id}/$everything' \
-//   -H "Authorization: Bearer accesstokenaccesstoken"
-
-app.post('/api/fhir', async (req, res) => {
-  const system_id = '​4706'; // Epic demo
-  // const access_token = '996cd2f6bca74878a7f2bfe658f17597';
-  const access_token = req.body.code || 'accessCode';
-  console.log('auth: ', auth);
-  // const url = `${api_url}/${system_id}?access_token=${access_token}`;
-  const url = 'https://quick.1up.health/connect/4706?access_token=996cd2f6bca74878a7f2bfe658f17597'
-
-  // redirect gives url params
-  const apiResonse = await fetch(url, { method: 'GET' })
-    .then(res => {
-      console.log('res', res);
-      return res;
-    })
-    // .then(res => res.json())
-    // .then(json => { 
-    //   console.log('json response from 1up', json);
-    //   return json 
-    // })
-    .catch(err => res.send(`Error in express fetch: ${err}`));
-  
-  res.send(apiResonse);
-});
-
+/**
+ * From Docs:
+ * FHIR Api $everything query
+ * To query everything simply hit this endpoint with the patient's id, fhir version type (dstu2/stu3/r4) and their bearer access token.
+ * curl -X GET 'https://api.1up.health/fhir/{fhirVersion}/Patient/{patient_id}/$everything' \
+ *  -H "Authorization: Bearer accesstokenaccesstoken"
+ */
 app.post('/api/fhir/everything', async (req, res) => {
-  console.log('$everything');
   const access_token = req.body.code || 'accessCode';
   const patient_id = req.body.patient_id || 'patientId';
   const fhirVersion = req.body.fhirVersion || 'DSTU2';
@@ -120,25 +97,15 @@ app.post('/api/fhir/everything', async (req, res) => {
         'credentials': 'include'
       }
     };
-
     
     const apiResponse = await fetch(url, reqOptions)
-      .then(res => { console.log('res status', res.status); return res; })
-      .then(res => { console.log('res', res); return res; })
-      .then(res => res.json)
+      .then(res => res.json())
       .then(json => json)
       .catch(err => err);
   
-      // const bundles = await new Promise((res, rej) => {
-      //   getAllFhirResourceBundles(access_token, (data) => res(data));
-      // }).then(data => data); 
-  
-      // console.log('bundles', bundles);
-  
-    console.log('apiResponse', apiResponse);
-    res.send(apiResonse);
-      // res.send(bundles);
+    res.send(apiResponse);
   } catch (error) {
+    console.log('error getting $everything', error);
     res.send({error: JSON.stringify(error)});
   }
 });
