@@ -2,6 +2,8 @@ import React from 'react';
 
 const fetch = require('isomorphic-fetch');
 
+const prettyPrintJson = (jsonObj) => JSON.stringify(jsonObj, null, 2);
+
 export default class OneUpApp extends React.Component {
   constructor(props) {
     super(props);
@@ -19,8 +21,6 @@ export default class OneUpApp extends React.Component {
     this.getToken = this.getToken.bind(this);
     this.getFhirEverything = this.getFhirEverything.bind(this);
   }
-
- 
 
   handleGetCode(event) {
     event.preventDefault();
@@ -49,7 +49,7 @@ export default class OneUpApp extends React.Component {
 
     console.log('response from express', json);
     this.setState({
-      apiResponse: JSON.stringify(json),
+      apiResponse: prettyPrintJson(json),
       accessCode: json.code,
       appUserId: json.app_user_id
     });
@@ -66,7 +66,7 @@ export default class OneUpApp extends React.Component {
 
     console.log('response from express', json);
     this.setState({
-      apiResponse: JSON.stringify(json),
+      apiResponse: prettyPrintJson(json),
       accessToken: json.access_token
     });
   }
@@ -82,7 +82,7 @@ export default class OneUpApp extends React.Component {
     const json = await response.json();
 
     console.log('response from express', json);
-    this.setState({apiResponse: JSON.stringify(json)});
+    this.setState({apiResponse: prettyPrintJson(json)});
   }
 
   render() {
@@ -100,7 +100,9 @@ export default class OneUpApp extends React.Component {
 
         <div>
           api response:
-          <div>
+          <div style={{
+            maxWidth: '100vw'
+          }}>
             {this.state && this.state.apiResponse }
           </div>
         </div>
