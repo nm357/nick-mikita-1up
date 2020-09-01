@@ -53,7 +53,6 @@ app.post('/api/code', async (req, res) => {
 });
 
 app.post('/api/token', async (req, res) => {
-  console.log('auth', auth);
   const code = req.body.code || 'accessCode';
   const postUrl = `${token_url}?client_id=${client_id}&client_secret=${client_secret}&code=${code}&grant_type=authorization_code`;
   
